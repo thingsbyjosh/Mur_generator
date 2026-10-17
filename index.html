@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Coartada · casos de lógica</title>
+<meta name="description" content="Generador infinito de puzles de lógica de misterio: coloca a los sospechosos en la cuadrícula y descubre al asesino.">
+<link rel="stylesheet" href="src/ui/styles.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand"><span class="logo">🔎</span><h1 id="appName">Coartada</h1><span class="tag">casos de lógica infinitos</span></div>
+  <form id="controls" class="controls">
+    <label>Dificultad
+      <select id="difficulty">
+        <option value="facil">Fácil</option>
+        <option value="media" selected>Media</option>
+        <option value="dificil">Difícil</option>
+        <option value="experto">Experto</option>
+      </select>
+    </label>
+    <label>Tamaño
+      <select id="size">
+        <option value="auto" selected>Auto</option>
+        <option value="4">4×4</option><option value="5">5×5</option><option value="6">6×6</option><option value="7">7×7</option><option value="8">8×8</option>
+      </select>
+    </label>
+    <label>Semilla <input id="seed" type="text" placeholder="aleatoria" size="12" autocomplete="off"></label>
+    <button type="submit" class="primary">Nuevo caso</button>
+    <button type="button" id="daily">Caso del día</button>
+  </form>
+</header>
+
+<main class="layout">
+  <section class="board-wrap">
+    <div class="case-head">
+      <h2 id="caseTitle">—</h2>
+      <div class="meta"><span id="caseMeta"></span> · <span id="timer">0:00</span></div>
+    </div>
+    <div id="board" class="board" role="grid" aria-label="Escenario del crimen"></div>
+    <div class="palette" id="palette"></div>
+    <div class="actions">
+      <button id="check">Comprobar</button>
+      <button id="hint">Pista</button>
+      <button id="accuse" class="primary">Acusar</button>
+      <button id="solve" class="ghost">Resolver</button>
+      <button id="share" class="ghost">Copiar enlace</button>
+    </div>
+    <p id="status" class="status" aria-live="polite"></p>
+  </section>
+
+  <aside class="side">
+    <h3>Declaraciones</h3>
+    <ul id="clues" class="clues"></ul>
+    <details class="rules">
+      <summary>Reglas</summary>
+      <ol>
+        <li>Cada personaje ocupa una casilla. Nunca hay dos en la misma fila ni en la misma columna.</li>
+        <li>Las casillas con objetos están ocupadas: nadie puede estar ahí.</li>
+        <li>Todas las declaraciones son ciertas.</li>
+        <li><b>El asesino</b> es el único sospechoso que está en la misma estancia que la víctima. Siempre hay exactamente uno.</li>
+        <li>«Junto a» significa casilla contigua en horizontal o vertical. «A la izquierda de» o «más arriba que» significa en cualquier columna o fila anterior, no necesariamente contigua.</li>
+      </ol>
+    </details>
+    <details class="legend"><summary>Estancias</summary><ul id="legend"></ul></details>
+  </aside>
+</main>
+
+<footer class="foot">
+  <p>Puzles generados al vuelo con solución única garantizada. Proyecto independiente, sin relación con ninguna editorial ni marca de puzles.</p>
+</footer>
+<script type="module" src="src/ui/app.js"></script>
+</body>
+</html>

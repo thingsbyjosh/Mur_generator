@@ -1,0 +1,13 @@
+{
+  "name": "mur-generator",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Generador aleatorio de puzles de lógica de misterio (estilo sudoku de asesinato) con filtro de dificultad.",
+  "scripts": {
+    "bench": "node scripts/bench.js",
+    "gen": "node scripts/cli.js",
+    "test": "node scripts/test.js",
+    "serve": "python3 -m http.server 8080"
+  }
+}
