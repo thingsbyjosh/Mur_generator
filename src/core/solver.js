@@ -5,26 +5,37 @@ import { clueHolds, clueObject } from './clues.js';
 const row = (c, N) => Math.floor(c / N);
 const col = (c, N) => c % N;
 
+import { WALL_FEATURES } from './data.js';
+
 export function buildCtx(puzzle) {
   const { N, roomOf, itemAt, rooms, chars, victimId, victimCell, theme } = puzzle;
+  const walls = puzzle.walls || [];
   const charById = {};
   chars.forEach((c) => (charById[c.id] = c));
   const itemsById = {};
   theme.items.forEach((it) => (itemsById[it.id] = it));
   const itemIds = [...new Set(itemAt.filter(Boolean))];
+  const blocked = new Set();
+  itemAt.forEach((it, c) => { if (it && itemsById[it].blocks) blocked.add(c); });
+  const wallAt = {};
+  const addWall = (c, id) => { (wallAt[c] = wallAt[c] || new Set()).add(id); };
+  for (const w of walls) { addWall(w.cell, w.id); if (w.other !== undefined) addWall(w.other, w.id); }
+  const wallsById = Object.fromEntries(WALL_FEATURES.map((w) => [w.id, w]));
   return {
     N, roomOf, itemAt, rooms, chars, charById, victimId, victimCell,
-    victimRoom: roomOf[victimCell], itemsById, itemIds,
+    victimRoom: roomOf[victimCell], itemsById, itemIds, blocked,
+    hasSittable: itemIds.some((i) => !itemsById[i].blocks),
+    walls, wallAt, wallsById, wallIds: [...new Set(walls.map((w) => w.id))],
     roomWord: theme.roomWord, sameRoomPhrase: theme.sameRoomPhrase,
     suspects: chars.filter((c) => c.id !== victimId).map((c) => c.id),
   };
 }
 
 function initialDomains(ctx, clues) {
-  const { N, itemAt, victimCell, victimId } = ctx;
+  const { N, blocked, victimCell, victimId } = ctx;
   const free = [];
   for (let c = 0; c < N * N; c++) {
-    if (itemAt[c]) continue;
+    if (blocked.has(c)) continue;
     if (c === victimCell) continue;
     if (row(c, N) === row(victimCell, N) || col(c, N) === col(victimCell, N)) continue;
     free.push(c);
@@ -191,9 +202,12 @@ export function grade(ctx, clues, maxDepth = 3) {
   return { logical: r.ok, rounds: totalRounds, guessDepth: r.ok ? r.depth : maxDepth + 1, guesses };
 }
 
-// Resolución por propagación paso a paso, para dar pistas en la interfaz.
-export function logicalSolution(ctx, clues) {
+// Dominios tras un número limitado de rondas de propagación, para la pista en dos pasos.
+export function hintDomains(ctx, clues, rounds = 1) {
   const dom = initialDomains(ctx, clues);
-  propagate(ctx, clues, dom);
+  for (let i = 0; i < rounds; i++) {
+    const { changed, contradiction } = propagateOnce(ctx, clues, dom);
+    if (!changed || contradiction) break;
+  }
   return dom;
 }

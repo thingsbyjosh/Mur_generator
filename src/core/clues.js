@@ -7,17 +7,21 @@
 
 const row = (c, N) => Math.floor(c / N);
 const col = (c, N) => c % N;
-const adjacent = (a, b, N) => {
+// Contiguo en horizontal o vertical Y dentro de la misma estancia (una pared separa).
+const adjacent = (ctx, a, b) => {
+  const N = ctx.N;
   const ra = row(a, N), ca = col(a, N), rb = row(b, N), cb = col(b, N);
-  return Math.abs(ra - rb) + Math.abs(ca - cb) === 1;
+  return Math.abs(ra - rb) + Math.abs(ca - cb) === 1 && ctx.roomOf[a] === ctx.roomOf[b];
 };
 const onEdge = (c, N) => row(c, N) === 0 || row(c, N) === N - 1 || col(c, N) === 0 || col(c, N) === N - 1;
 const inCorner = (c, N) => (row(c, N) === 0 || row(c, N) === N - 1) && (col(c, N) === 0 || col(c, N) === N - 1);
 const nextToItem = (ctx, c, itemId) => {
-  const N = ctx.N;
-  for (const d of neighbors(c, N)) if (ctx.itemAt[d] === itemId) return true;
+  for (const d of neighbors(c, ctx.N)) if (ctx.itemAt[d] === itemId && adjacent(ctx, c, d)) return true;
   return false;
 };
+// Ventanas y puertas van en los lados de las casillas: ctx.wallAt[c] = Set de ids de elemento de pared.
+const nextToWall = (ctx, c, wallId) => ctx.wallAt[c]?.has(wallId) || false;
+const sittable = (ctx, c) => !!ctx.itemAt[c] && !ctx.itemsById[ctx.itemAt[c]].blocks;
 export function neighbors(c, N) {
   const r = row(c, N), k = col(c, N), out = [];
   if (r > 0) out.push(c - N);
@@ -97,7 +101,7 @@ export const CLUE_TYPES = {
     text: (ctx, p) => `está junto a ${itemText(ctx, p.item)}`,
     enumerate: (ctx, S, sol) => {
       const seen = new Set();
-      for (const d of neighbors(sol[S], ctx.N)) if (ctx.itemAt[d]) seen.add(ctx.itemAt[d]);
+      for (const d of neighbors(sol[S], ctx.N)) if (ctx.itemAt[d] && adjacent(ctx, sol[S], d)) seen.add(ctx.itemAt[d]);
       return [...seen].map((item) => ({ item }));
     },
   },
@@ -107,23 +111,47 @@ export const CLUE_TYPES = {
     text: (ctx, p) => `no está junto a ${itemText(ctx, p.item)}`,
     enumerate: (ctx, S, sol) => {
       const near = new Set();
-      for (const d of neighbors(sol[S], ctx.N)) if (ctx.itemAt[d]) near.add(ctx.itemAt[d]);
+      for (const d of neighbors(sol[S], ctx.N)) if (ctx.itemAt[d] && adjacent(ctx, sol[S], d)) near.add(ctx.itemAt[d]);
       return ctx.itemIds.filter((i) => !near.has(i)).map((item) => ({ item }));
     },
   },
+  onItem: {
+    level: 1, unary: true,
+    test: (ctx, p, cS) => ctx.itemAt[cS] === p.item,
+    text: (ctx, p) => `está sobre ${itemText(ctx, p.item)}`,
+    enumerate: (ctx, S, sol) => (sittable(ctx, sol[S]) ? [{ item: ctx.itemAt[sol[S]] }] : []),
+  },
+  standing: {
+    level: 3, unary: true,
+    test: (ctx, p, cS) => !sittable(ctx, cS),
+    text: () => `está de pie, no sobre ningún mueble`,
+    enumerate: (ctx, S, sol) => (!sittable(ctx, sol[S]) && ctx.hasSittable ? [{}] : []),
+  },
+  nextToWall: {
+    level: 2, unary: true,
+    test: (ctx, p, cS) => nextToWall(ctx, cS, p.wall),
+    text: (ctx, p) => `está junto a ${ctx.wallsById[p.wall].art} ${ctx.wallsById[p.wall].name}`,
+    enumerate: (ctx, S, sol) => [...(ctx.wallAt[sol[S]] || [])].map((wall) => ({ wall })),
+  },
+  notNextToWall: {
+    level: 3, unary: true,
+    test: (ctx, p, cS) => !nextToWall(ctx, cS, p.wall),
+    text: (ctx, p) => `no está junto a ninguna ${ctx.wallsById[p.wall].name}`,
+    enumerate: (ctx, S, sol) => ctx.wallIds.filter((w) => !nextToWall(ctx, sol[S], w)).map((wall) => ({ wall })),
+  },
   adjacentTo: {
     level: 2, unary: false,
-    test: (ctx, p, cS, cO) => adjacent(cS, cO, ctx.N),
+    test: (ctx, p, cS, cO) => adjacent(ctx, cS, cO),
     text: (ctx, p) => `está junto a ${nameOf(ctx, p.other)}`,
     enumerate: (ctx, S, sol) =>
-      otherSuspects(ctx, S).filter((O) => adjacent(sol[S], sol[O], ctx.N)).map((other) => ({ other })),
+      otherSuspects(ctx, S).filter((O) => adjacent(ctx, sol[S], sol[O])).map((other) => ({ other })),
   },
   notAdjacentTo: {
     level: 3, unary: false,
-    test: (ctx, p, cS, cO) => !adjacent(cS, cO, ctx.N),
+    test: (ctx, p, cS, cO) => !adjacent(ctx, cS, cO),
     text: (ctx, p) => `no está junto a ${nameOf(ctx, p.other)}`,
     enumerate: (ctx, S, sol) =>
-      otherSuspects(ctx, S).filter((O) => !adjacent(sol[S], sol[O], ctx.N)).map((other) => ({ other })),
+      otherSuspects(ctx, S).filter((O) => !adjacent(ctx, sol[S], sol[O])).map((other) => ({ other })),
   },
   leftOf: {
     level: 2, unary: false,

@@ -13,6 +13,7 @@
   <form id="controls" class="controls">
     <label>Dificultad
       <select id="difficulty">
+        <option value="muyfacil">Muy fácil</option>
         <option value="facil">Fácil</option>
         <option value="media" selected>Media</option>
         <option value="dificil">Difícil</option>
@@ -39,6 +40,18 @@
     </div>
     <div id="board" class="board" role="grid" aria-label="Escenario del crimen"></div>
     <div class="palette" id="palette"></div>
+    <div class="tools" id="tools" role="toolbar" aria-label="Herramientas">
+      <button type="button" data-tool="auto" class="tool sel" title="Toque: nota · Pulsación larga o doble toque: colocar · Clic derecho: X">Auto</button>
+      <button type="button" data-tool="note" class="tool" title="Toque: anotar candidato">Nota</button>
+      <button type="button" data-tool="place" class="tool" title="Toque: colocar">Colocar</button>
+      <button type="button" data-tool="x" class="tool" title="Toque: marcar X">✕</button>
+      <button type="button" data-tool="erase" class="tool" title="Toque: borrar casilla">Goma</button>
+      <span class="sep"></span>
+      <button type="button" id="undo" title="Deshacer (Ctrl+Z)">↶</button>
+      <button type="button" id="redo" title="Rehacer (Ctrl+Y)">↷</button>
+      <button type="button" id="clear" class="ghost" title="Vaciar el tablero">Limpiar</button>
+    </div>
+    <p class="help">Toca para anotar un candidato, mantén pulsado o toca dos veces para colocar. Sin sospechoso elegido, un toque marca ✕. En escritorio, clic derecho = ✕.</p>
     <div class="actions">
       <button id="check">Comprobar</button>
       <button id="hint">Pista</button>
@@ -56,10 +69,11 @@
       <summary>Reglas</summary>
       <ol>
         <li>Cada personaje ocupa una casilla. Nunca hay dos en la misma fila ni en la misma columna.</li>
-        <li>Las casillas con objetos están ocupadas: nadie puede estar ahí.</li>
+        <li>Hay muebles que bloquean la casilla (plantas, mesas, estanterías…) y muebles sobre los que sí se puede estar (sofás, sillas, camas, bancos).</li>
         <li>Todas las declaraciones son ciertas.</li>
         <li><b>El asesino</b> es el único sospechoso que está en la misma estancia que la víctima. Siempre hay exactamente uno.</li>
-        <li>«Junto a» significa casilla contigua en horizontal o vertical. «A la izquierda de» o «más arriba que» significa en cualquier columna o fila anterior, no necesariamente contigua.</li>
+        <li>«Junto a» significa casilla contigua en horizontal o vertical <b>dentro de la misma estancia</b>; una pared separa. Las ventanas y puertas están en las paredes: se está «junto a» ellas desde la casilla que las toca.</li>
+        <li>«A la izquierda de» o «más arriba que» significa en cualquier columna o fila anterior, no necesariamente contigua.</li>
       </ol>
     </details>
     <details class="legend"><summary>Estancias</summary><ul id="legend"></ul></details>

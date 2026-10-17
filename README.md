@@ -22,17 +22,32 @@ Los parámetros van en la URL, así que un enlace reproduce exactamente el mismo
 index.html#c-dificil-7-mi-semilla
 ```
 
-- primer tramo: `facil` · `media` · `dificil` · `experto`
+- primer tramo: `muyfacil` · `facil` · `media` · `dificil` · `experto`
 - segundo tramo: `auto` o tamaño 4–8
 - tercer tramo: semilla (letras, dígitos, `.`, `_`, `~`, `-`). «Caso del día» usa `dia-AAAA-MM-DD`.
+
+## Cómo se juega (gestos)
+
+- Elige un sospechoso. **Toque** en una casilla = anotar candidato. **Pulsación larga** o **doble toque** = colocar.
+- Sin sospechoso elegido, un toque marca **✕**. En escritorio, **clic derecho** = ✕. Teclas 1-7 eligen sospechoso.
+- Al colocar a alguien, su fila y su columna quedan excluidas automáticamente (✕ tenue) y sus notas antiguas desaparecen.
+- Herramientas explícitas (Nota, Colocar, ✕, Goma) para quien prefiera modos a gestos. Deshacer y rehacer ilimitados (Ctrl+Z / Ctrl+Y).
+- **Pista** en dos pasos: primero rodea dónde puede estar un sospechoso según sus declaraciones; el segundo toque lo coloca.
+- El progreso de cada caso se guarda en el navegador (sin cuenta).
+
+## Reglas
+
+- Un personaje por fila y columna. Los muebles que bloquean (plantas, mesas, estanterías…) no se pueden ocupar; sobre sofás, sillas, camas y bancos sí se puede estar.
+- «Junto a» es contiguo en horizontal o vertical **dentro de la misma estancia**. Ventanas y puertas están en las paredes.
+- El asesino es el único sospechoso en la estancia de la víctima.
 
 ## Cómo funciona el generador
 
 1. **Escenario**: regiones conexas (estancias) por crecimiento aleatorio, con nombre y color.
 2. **Solución**: una permutación (un personaje por fila y columna) tal que exactamente un sospechoso
    comparte estancia con la víctima. Después se colocan objetos en casillas libres.
-3. **Pistas**: se enumeran todas las declaraciones verdaderas de 16 tipos (estancia, borde, junto a objeto,
-   junto a / izquierda de / encima de otro personaje, misma estancia, y sus negaciones).
+3. **Pistas**: se enumeran todas las declaraciones verdaderas de 20 tipos (estancia, borde, junto a objeto, sobre un
+   mueble, junto a ventana o puerta, junto a / izquierda de / encima de otro personaje, misma estancia, y negaciones).
 4. **Reducción**: se añaden pistas hasta que el solver por backtracking confirma solución única, y luego
    se eliminan las redundantes. El orden de eliminación se sesga según la dificultad pedida (en fácil
    sobreviven las pistas directas; en difícil, las relacionales).

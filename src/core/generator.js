@@ -3,12 +3,13 @@
 // dar con la dificultad pedida.
 import { makeRng, hashSeed } from './rng.js';
 import { THEMES, PEOPLE, DIFFICULTIES } from './data.js';
-import { generateRooms, generateSolution, placeItems } from './layout.js';
+import { generateRooms, generateSolution, placeItems, placeWalls } from './layout.js';
 import { enumerateClues, clueText, CLUE_TYPES } from './clues.js';
 import { buildCtx, countSolutions, grade } from './solver.js';
 
 const ALL_TYPES = Object.keys(CLUE_TYPES);
 const TYPES_BY_DIFF = {
+  muyfacil: ALL_TYPES,
   facil: ALL_TYPES,
   media: ALL_TYPES.filter((t) => t !== 'rowIs' && t !== 'colIs'),
   dificil: ALL_TYPES.filter((t) => t !== 'rowIs' && t !== 'colIs' && t !== 'inCorner'),
@@ -22,8 +23,9 @@ export function difficultyScore(N, g, clues) {
   return (N - 4) * 3 + g.rounds * 1.2 + rel * 0.6 + neg * 0.8 + g.guessDepth * 9;
 }
 export const SCORE_BANDS = {
-  facil: [0, 9],
-  media: [9, 16],
+  muyfacil: [0, 5.5],
+  facil: [5.5, 10],
+  media: [10, 16],
   dificil: [16, 26],
   experto: [26, Infinity],
 };
@@ -45,9 +47,11 @@ function buildCandidate(rng, N, difficulty) {
   const sol = generateSolution(rng, N, roomOf, ids, victimId);
   if (!sol) return null;
   const itemCount = Math.max(1, N - 2 + rng.int(2));
-  const itemAt = placeItems(rng, N, roomOf, sol.solution, theme.items, itemCount);
+  const sittableCount = rng.int(3); // 0-2 muebles sobre los que se puede estar
+  const itemAt = placeItems(rng, N, roomOf, sol.solution, theme.items, itemCount, sittableCount);
+  const walls = placeWalls(rng, N, roomOf, 1 + rng.int(Math.max(1, N - 3)), rng.int(3));
   const puzzle = {
-    N, theme, rooms: roomDefs, roomOf, itemAt, chars, victimId,
+    N, theme, rooms: roomDefs, roomOf, itemAt, walls, chars, victimId,
     victimCell: sol.solution[victimId], solution: sol.solution, killer: sol.killer,
   };
   const ctx = buildCtx(puzzle);
@@ -55,7 +59,7 @@ function buildCandidate(rng, N, difficulty) {
   if (pool.length === 0) return null;
 
   // Orden de inserción: para fácil preferimos pistas directas; para difícil, relacionales.
-  const bias = difficulty === 'facil' ? -1 : difficulty === 'media' ? 0 : 1;
+  const bias = difficulty === 'muyfacil' ? -1.5 : difficulty === 'facil' ? -1 : difficulty === 'media' ? 0 : 1;
   const weighted = pool.map((c) => ({ c, w: rng.next() + bias * 0.25 * (c.level - 2) }));
   weighted.sort((a, b) => a.w - b.w);
   const ordered = weighted.map((x) => x.c);

@@ -2,7 +2,7 @@ import { generatePuzzle, difficultyScore } from '../src/core/generator.js';
 import { buildCtx, countSolutions, grade } from '../src/core/solver.js';
 
 const n = Number(process.argv[2] || 15);
-const diffs = ['facil', 'media', 'dificil', 'experto'];
+const diffs = ['muyfacil', 'facil', 'media', 'dificil', 'experto'];
 for (const d of diffs) {
   const rows = [];
   const t0 = performance.now();

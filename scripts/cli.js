@@ -14,12 +14,13 @@ for (let r = 0; r < N; r++) {
     const i = r * N + c;
     const item = p.itemAt[i];
     const who = Object.entries(p.solution).find(([, cell]) => cell === i);
-    const mark = item ? '#' : who ? (who[0] === p.victimId ? 'V' : byId[who[0]].name[0]) : '.';
+    const mark = who ? (who[0] === p.victimId ? 'V' : byId[who[0]].name[0]) : item ? (p.theme.items.find(i => i.id === item).blocks ? '#' : '_') : '.';
     s += `${p.roomOf[i]}${mark} `;
   }
   line.push(s);
 }
 console.log(line.join('\n'));
+console.log('Paredes:', (p.walls || []).map(w => `${w.id}@${w.cell}:${w.side}`).join(' ') || 'ninguna');
 console.log(`Víctima: ${byId[p.victimId].name} (fila ${Math.floor(p.victimCell / N) + 1}, col ${String.fromCharCode(65 + p.victimCell % N)})`);
 console.log('Pistas:');
 for (const c of p.chars) {

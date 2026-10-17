@@ -45,10 +45,11 @@ export function generateSolution(rng, N, roomOf, charIds, victimId, maxTries = 2
 
 // Coloca objetos en casillas libres (no ocupadas por la solución), dejando al menos una casilla
 // libre por estancia y sin bloquear por completo ninguna fila/columna.
-export function placeItems(rng, N, roomOf, solution, items, count) {
+export function placeItems(rng, N, roomOf, solution, items, count, sittableCount) {
   const occupied = new Set(Object.values(solution));
   const free = rng.shuffle([...Array(N * N).keys()].filter((c) => !occupied.has(c)));
   const itemAt = new Array(N * N).fill(null);
+  const blocking = items.filter((i) => i.blocks), seats = items.filter((i) => !i.blocks);
   const roomFree = {};
   roomOf.forEach((r, c) => { if (!occupied.has(c)) roomFree[r] = (roomFree[r] || 0) + 1; });
   let placed = 0;
@@ -56,9 +57,33 @@ export function placeItems(rng, N, roomOf, solution, items, count) {
     if (placed >= count) break;
     const r = roomOf[c];
     if ((roomFree[r] || 0) <= 1) continue;
-    itemAt[c] = rng.pick(items).id;
+    itemAt[c] = rng.pick(blocking).id;
     roomFree[r]--;
     placed++;
   }
+  // Muebles sobre los que se puede estar: en casillas de la solución o libres, indistintamente.
+  if (seats.length && sittableCount > 0) {
+    const cands = rng.shuffle([...Array(N * N).keys()].filter((c) => !itemAt[c]));
+    for (const c of cands.slice(0, sittableCount)) itemAt[c] = rng.pick(seats).id;
+  }
   return itemAt;
+}
+
+// Elementos de pared: ventanas en el perímetro exterior, puertas entre dos estancias distintas.
+// Devuelve lista de { cell, side, id } (side: 0 arriba, 1 derecha, 2 abajo, 3 izquierda).
+export function placeWalls(rng, N, roomOf, windows, doors) {
+  const outer = [], inner = [];
+  for (let c = 0; c < N * N; c++) {
+    const r = Math.floor(c / N), k = c % N;
+    if (r === 0) outer.push({ cell: c, side: 0 });
+    if (k === N - 1) outer.push({ cell: c, side: 1 });
+    if (r === N - 1) outer.push({ cell: c, side: 2 });
+    if (k === 0) outer.push({ cell: c, side: 3 });
+    if (k < N - 1 && roomOf[c] !== roomOf[c + 1]) inner.push({ cell: c, side: 1, other: c + 1 });
+    if (r < N - 1 && roomOf[c] !== roomOf[c + N]) inner.push({ cell: c, side: 2, other: c + N });
+  }
+  const out = [];
+  for (const w of rng.shuffle(outer).slice(0, windows)) out.push({ ...w, id: 'ventana' });
+  for (const d of rng.shuffle(inner).slice(0, doors)) out.push({ ...d, id: 'puerta' });
+  return out;
 }

@@ -18,14 +18,15 @@ export const THEMES = [
       { name: 'Galería', art: 'la' },
     ],
     items: [
-      { id: 'planta', name: 'planta', art: 'una', emoji: '🪴' },
-      { id: 'reloj', name: 'reloj', art: 'un', emoji: '🕰️' },
-      { id: 'cuadro', name: 'cuadro', art: 'un', emoji: '🖼️' },
-      { id: 'sofa', name: 'sofá', art: 'un', emoji: '🛋️' },
-      { id: 'libreria', name: 'librería', art: 'una', emoji: '📚' },
-      { id: 'candelabro', name: 'candelabro', art: 'un', emoji: '🕯️' },
-      { id: 'piano', name: 'piano', art: 'un', emoji: '🎹' },
-      { id: 'gato', name: 'gato', art: 'un', emoji: '🐈' },
+      { id: 'planta', name: 'planta', art: 'una', emoji: '🪴', blocks: true },
+      { id: 'reloj', name: 'reloj', art: 'un', emoji: '🕰️', blocks: true },
+      { id: 'mesa', name: 'mesa', art: 'una', emoji: '🪵', blocks: true },
+      { id: 'libreria', name: 'librería', art: 'una', emoji: '📚', blocks: true },
+      { id: 'candelabro', name: 'candelabro', art: 'un', emoji: '🕯️', blocks: true },
+      { id: 'piano', name: 'piano', art: 'un', emoji: '🎹', blocks: true },
+      { id: 'sofa', name: 'sofá', art: 'un', emoji: '🛋️', blocks: false },
+      { id: 'silla', name: 'silla', art: 'una', emoji: '🪑', blocks: false },
+      { id: 'cama', name: 'cama', art: 'una', emoji: '🛏️', blocks: false },
     ],
   },
   {
@@ -43,13 +44,13 @@ export const THEMES = [
       { name: 'Compartimento B', art: 'el' },
     ],
     items: [
-      { id: 'baul', name: 'baúl', art: 'un', emoji: '🧳' },
-      { id: 'butaca', name: 'butaca', art: 'una', emoji: '🪑' },
-      { id: 'botella', name: 'botella', art: 'una', emoji: '🍾' },
-      { id: 'periodico', name: 'periódico', art: 'un', emoji: '📰' },
-      { id: 'perro', name: 'perro', art: 'un', emoji: '🐕' },
-      { id: 'reloj', name: 'reloj', art: 'un', emoji: '🕰️' },
-      { id: 'lampara', name: 'lámpara', art: 'una', emoji: '🪔' },
+      { id: 'baul', name: 'baúl', art: 'un', emoji: '🧳', blocks: true },
+      { id: 'mesita', name: 'mesita', art: 'una', emoji: '🪵', blocks: true },
+      { id: 'perro', name: 'perro', art: 'un', emoji: '🐕', blocks: true },
+      { id: 'reloj', name: 'reloj', art: 'un', emoji: '🕰️', blocks: true },
+      { id: 'lampara', name: 'lámpara', art: 'una', emoji: '🪔', blocks: true },
+      { id: 'butaca', name: 'butaca', art: 'una', emoji: '🪑', blocks: false },
+      { id: 'litera', name: 'litera', art: 'una', emoji: '🛏️', blocks: false },
     ],
   },
   {
@@ -67,13 +68,13 @@ export const THEMES = [
       { name: 'Archivo', art: 'el' },
     ],
     items: [
-      { id: 'estatua', name: 'estatua', art: 'una', emoji: '🗿' },
-      { id: 'anfora', name: 'ánfora', art: 'un', emoji: '🏺' },
-      { id: 'cuadro', name: 'cuadro', art: 'un', emoji: '🖼️' },
-      { id: 'planta', name: 'planta', art: 'una', emoji: '🪴' },
-      { id: 'vitrina', name: 'vitrina', art: 'una', emoji: '💎' },
-      { id: 'reloj', name: 'reloj', art: 'un', emoji: '🕰️' },
-      { id: 'banco', name: 'banco', art: 'un', emoji: '🛋️' },
+      { id: 'estatua', name: 'estatua', art: 'una', emoji: '🗿', blocks: true },
+      { id: 'anfora', name: 'ánfora', art: 'un', emoji: '🏺', blocks: true },
+      { id: 'planta', name: 'planta', art: 'una', emoji: '🪴', blocks: true },
+      { id: 'vitrina', name: 'vitrina', art: 'una', emoji: '💎', blocks: true },
+      { id: 'reloj', name: 'reloj', art: 'un', emoji: '🕰️', blocks: true },
+      { id: 'banco', name: 'banco', art: 'un', emoji: '🛋️', blocks: false },
+      { id: 'taburete', name: 'taburete', art: 'un', emoji: '🪑', blocks: false },
     ],
   },
 ];
@@ -101,7 +102,13 @@ export const PEOPLE = [
 
 export const VICTIM_EMOJI = '💀';
 
+export const WALL_FEATURES = [
+  { id: 'ventana', name: 'ventana', art: 'una', outer: true },
+  { id: 'puerta', name: 'puerta', art: 'una', outer: false },
+];
+
 export const DIFFICULTIES = {
+  muyfacil: { label: 'Muy fácil', sizes: [4] },
   facil: { label: 'Fácil', sizes: [4, 5] },
   media: { label: 'Media', sizes: [5, 6] },
   dificil: { label: 'Difícil', sizes: [6, 7] },
