@@ -19,12 +19,12 @@ npm run serve      # o cualquier servidor estático
 Los parámetros van en la URL, así que un enlace reproduce exactamente el mismo caso:
 
 ```
-index.html#d=dificil&n=7&s=mi-semilla
+index.html#c-dificil-7-mi-semilla
 ```
 
-- `d`: `facil` · `media` · `dificil` · `experto`
-- `n`: `auto` o tamaño 4–8
-- `s`: semilla (texto libre). «Caso del día» usa `dia-AAAA-MM-DD`.
+- primer tramo: `facil` · `media` · `dificil` · `experto`
+- segundo tramo: `auto` o tamaño 4–8
+- tercer tramo: semilla (letras, dígitos, `.`, `_`, `~`, `-`). «Caso del día» usa `dia-AAAA-MM-DD`.
 
 ## Cómo funciona el generador
 

@@ -15,19 +15,21 @@ const row = (c, N) => Math.floor(c / N), col = (c, N) => c % N;
 let puzzle, ctx, placed, selected, timerId, startedAt, finished;
 
 // ---------- estado en la URL ----------
+// Formato de ancla simple: #c-<dificultad>-<tamaño>-<semilla> (solo letras, dígitos, . _ ~ -)
+const cleanSeed = (s) => String(s).replace(/[^A-Za-z0-9._~-]/g, '').slice(0, 40);
 function readHash() {
-  const h = new URLSearchParams(location.hash.slice(1));
-  return { d: h.get('d') || 'media', n: h.get('n') || 'auto', s: h.get('s') || '' };
+  const m = /^#?c-([a-z]+)-([a-z0-9]+)-(.*)$/.exec(location.hash);
+  if (!m) return { d: 'media', n: 'auto', s: '' };
+  return { d: m[1], n: m[2], s: cleanSeed(m[3]) };
 }
 function writeHash(d, n, s) {
-  const h = new URLSearchParams({ d, n, s });
-  history.replaceState(null, '', '#' + h.toString());
+  try { history.replaceState(null, '', `#c-${d}-${n}-${cleanSeed(s)}`); } catch { /* sin historial */ }
 }
 const randomSeed = () => Math.random().toString(36).slice(2, 8);
 
 // ---------- carga de un caso ----------
 function load({ d, n, s }) {
-  if (!s) s = randomSeed();
+  s = cleanSeed(s) || randomSeed();
   els.difficulty.value = DIFFICULTIES[d] ? d : 'media';
   els.size.value = n;
   els.seed.value = s;
@@ -258,7 +260,7 @@ $('#hint').addEventListener('click', hint);
 $('#solve').addEventListener('click', solve);
 $('#accuse').addEventListener('click', accuse);
 $('#share').addEventListener('click', share);
-window.addEventListener('hashchange', () => { const h = readHash(); if (h.s && h.s !== els.seed.value) load(h); });
+window.addEventListener('hashchange', () => { const h = readHash(); if (h.s && (h.s !== els.seed.value || h.d !== els.difficulty.value || h.n !== els.size.value)) load(h); });
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { renderBoard(); renderLegend(); });
 document.addEventListener('keydown', (e) => {
   if (e.target.tagName === 'INPUT') return;
